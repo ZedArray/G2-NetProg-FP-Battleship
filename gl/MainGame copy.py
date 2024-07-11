@@ -336,21 +336,6 @@ def main():
                     elif cell[1] == 2:
                         pygame.draw.rect(WIN, "grey", cell[0])
 
-                #color ships
-                # screen = pygame.display.set_mode((1280, 720))
-                for cell in ship:
-                    if cell[1] == 2:
-                        # screen.fill("yellow")
-                        # screen.blit(ship1, ship1.get_rect())
-                        # pygame.draw.rect(screen, "red",  cell[0])
-                        # pygame.draw.rect(WIN, "red", cell[0])
-                        # pygame.draw.rect(WIN, "red", cell[0])
-                        pygame.draw.rect(ship1, (255,255,255,128), cell[0])
-                    elif cell[1] == 3:
-                        pygame.draw.rect(ship2, (255,255,255,128), cell[0])
-                    elif cell[1] ==4:
-                        pygame.draw.rect(ship3, (255,255,255,128), cell[0])
-
             # gameplay screen
             case 1:
                 for event in pygame.event.get():
@@ -381,8 +366,6 @@ def main():
                     hoverTarget(targetGrid)
 
                 WIN.blit(BG2, (0, 0))
-                # pygame.draw.rect(WIN, "dark blue", pygame.Rect(30, 130, 70, 60))
-                # pygame.draw.rect(WIN, "red", pygame.Rect(105, 130, 70, 60))
                 for cell in playerGrid:
                     if cell[1] == 0:
                         pygame.draw.rect(WIN, "dark blue", cell[0])
