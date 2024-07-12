@@ -69,6 +69,7 @@ class Server:
         with self.lock:
             if not self.queue:
                 print("queue is empty")
+                return False
             else:
                 self.queue.pop(0)
     def num_of_client(self):
