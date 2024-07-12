@@ -1,4 +1,5 @@
 import pygame
+from sock.client import playerClient
 
 darkgrey = (70,70,70)
 WIN = pygame.display.set_mode((1280, 720))
@@ -17,6 +18,12 @@ loseScreen = pygame.transform.scale(pygame.image.load("ui/losescreen.png"), (128
 shipLocs = [0] * 64
 shipLeft = [1, 2, 1]
 shipWholes = []
+sunkShip = 0
+states = 0
+hitandSunk = 0
+
+pc = playerClient()
+
 
 def main():
     rotation = True
@@ -266,9 +273,9 @@ def main():
 
     confirmButton = pygame.Rect(768, 573, 385, 60)
 
-    states = 0
-    
-    sunkShip = 0
+    global states
+
+    global hitandSunk
 
     turn = True
 
@@ -396,6 +403,33 @@ def main():
                         # send back a signal whether hit or not
                         # do hitShip() to check 
                         # after all that, turn = True to give turn back to this player
+                        targeted = -1
+                        receivedData = int(pc.get_data())
+                        print(receivedData)
+                        targeted = receivedData[0]
+                        pc.pop_data()
+                        # targeted = receive target location
+                        if shipLocs[targeted] == 0:
+                            playerGrid[targeted][1] = 2
+                            pc.send_data(70)
+                            # send a signal 70 indicating no hit
+                        elif shipLocs[targeted] == 1:
+                            playerGrid[targeted][1] = 3
+                            hitShip(targeted)
+                            ifSunk = checkforsink()
+                            if ifSunk:
+                                pc.send_data(90)
+                                # send a signal 90 indicating hit and sunk
+                                pass
+                            elif not ifSunk:
+                                pc.send_data(80)
+                                # send a signal 80 indicating hit
+                                pass
+                            # send back a signal for hit and if sink
+                            # return hit
+                        if targeted != -1:
+                            turn = True
+
                         continue
 
                     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -403,24 +437,54 @@ def main():
                             print(pygame.mouse.get_pos())
                             for i in range(64):
                                 if targetGrid[i][0].collidepoint(pygame.mouse.get_pos()):
-
+                                    
                                     # ask for the status of cell i (hit or no hit)
+                                    pc.send_data(str(i))
+                                    pc.get_data()
+                                    pc.pop_data()
+
+                                    returnSignal = 0
+                                    hitOrNo = True
+
+                                    if returnSignal == 70:
+                                        targetGrid[i][1] = 2
+                                        playerGrid[i][1] = 2
+                                    elif returnSignal == 80:
+                                        targetGrid[i][1] = 3
+                                        playerGrid[i][1] = 3
+                                    elif returnSignal == 90:
+                                        targetGrid[i][1] = 3
+                                        playerGrid[i][1] = 3
+                                        hitandSunk += 1
+                                        print("sunk")
+                                    
+                                    if hitandSunk == 4:
+                                        states = 5
+                                        
+                                    # if hitOrNo:
+                                    #     targetGrid[i][1] = 3
+                                    # if not hitOrNo:
+                                    #     targetGrid[i][1] = 2
 
                                     if shipLocs[i] == 0:
                                         targetGrid[i][1] = 2
+                                        playerGrid[i][1] = 2
                                     elif shipLocs[i] == 1:
                                         targetGrid[i][1] = 3
+                                        playerGrid[i][1] = 3
                                         hitShip(i)
-                                        checkforsink(states, sunkShip)
+                                        checkforsink()
+
                                         # keep checking for sink
                                     
                                     # after choosing target, give turn to other player
                                     # turn = False
                         if pygame.mouse.get_pressed()[1]:
                             print(shipWholes)
-                            states = 4
+                            # states = 4
                         if pygame.mouse.get_pressed()[2]:
-                            states = 5
+                            # states = 5
+                            print(sunkShip)
 
                             # print(playerGrid)
                     
@@ -432,6 +496,10 @@ def main():
                         pygame.draw.rect(WIN, "dark blue", cell[0])
                     elif cell[1] == 1:
                         pygame.draw.rect(WIN, darkgrey, cell[0])
+                    elif cell[1] == 2:
+                        pygame.draw.rect(WIN, "white", cell[0])
+                    elif cell[1] == 3:
+                        pygame.draw.rect(WIN, "red", cell[0])
                 for cell in targetGrid:
                     if cell[1] == 0:
                         pygame.draw.rect(WIN, "dark blue", cell[0])
@@ -477,15 +545,21 @@ def hitShip(target):
                 s[1] -= 1
                 print("hit")
 
-def checkforsink(s, sunk):
+def checkforsink():
+    global sunkShip
+    global states
+    sunkOne = 0
     for s in shipWholes:
         if s[1] == 0:
             s[1] -= 1
             print("blud got sunk")
-    sunk += 1
+            sunkOne = 1
+            sunkShip += 1
     # if sunkShip == 4, signal the other player and go to winscreen/losescreen
-    if (sunk == 4):
-        s = 5
+    if (sunkShip == 4):
+        states = 5
+    if sunkOne == 1:
+        return sunkOne
 
 def hoverTarget(tGrid):
     for cell in tGrid:

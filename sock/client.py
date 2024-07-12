@@ -1,4 +1,4 @@
-from network.connection import Client
+from sock.network.connection import Client
 
 class playerClient:
     def __init__ (self):

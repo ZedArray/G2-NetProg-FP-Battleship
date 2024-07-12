@@ -48,3 +48,4 @@ coverage.xml
 /sock/network/__pycache__
 /sock/network/__pycache__
 /sock/network/__pycache__
+*.pyc
