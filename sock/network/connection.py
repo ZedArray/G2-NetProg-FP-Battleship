@@ -86,7 +86,7 @@ class Client:
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ip_address = ip_address
         self.port = port
-        self.data = []
+        self.queue = []
         self.lock = Lock()
 
         try:
@@ -109,11 +109,11 @@ class Client:
                 print("Server closed connection")
                 self.running = False
                 sys.exit()
-            self.data.append(data)
+            self.queue.append(data)
 
     def get_queue(self):
         with self.lock:
-            return self.data.copy()
+            return self.queue.copy()
 
     def pop_queue(self):
         with self.lock:
