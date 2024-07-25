@@ -1,0 +1,12 @@
+How to play
+
+1. Run server.py on the sock folder
+2. Run 2 instances of MainGame.py
+3. The first instance to run should be player 1. and the second should be player 2. if switched, game breaks
+4. On ship placement screen, select a ship and place on the board. Left click to place, Right click to rotate placement rotation
+5. Confirm after placing down 4 ships (1pc 2length, 2pc 3length, 1pc 4length ships)
+6. Player 1 starts first, pick a cell to hit. need to go the player 2 window so the player 2 code can send back a signal. (red if hit, white if not hit)
+7. When 1 player loses all 4 ships, both players go to either the winscreen or losescreen
+8. Press any key to exit the game
+9. Close the server.py
+10. Repeat

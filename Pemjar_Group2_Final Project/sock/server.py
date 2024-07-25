@@ -45,7 +45,7 @@ class GameServer:
 
 if __name__ == "__main__":
     server = GameServer()
-
+    print("Server is running :D")
     while True:
         i = server.get_data()
         if i != []:
